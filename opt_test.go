@@ -71,9 +71,12 @@ func TestIfFull(t *testing.T) {
 	g := NewWithT(t)
 
 	o := New[any]('a')
+	called := false
 	o.If(func(a any) {
 		g.Expect(a).To(Equal('a'))
+		called = true
 	})
+	g.Expect(called).To(BeTrue())
 }
 
 func TestMarshalEmpty(t *testing.T) {
