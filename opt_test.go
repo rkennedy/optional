@@ -125,24 +125,6 @@ func TestOrElseFull(t *testing.T) {
 	g.Expect(o.OrElse('r')).To(Equal('q'))
 }
 
-func TestSetEmpty(t *testing.T) {
-	t.Parallel()
-	g := NewWithT(t)
-
-	var o Value[string]
-	o.Set("bar")
-	g.Expect(o.Get()).To(Equal("bar"))
-}
-
-func TestSetFull(t *testing.T) {
-	t.Parallel()
-	g := NewWithT(t)
-
-	o := New("foo")
-	o.Set("bar")
-	g.Expect(o.Get()).To(Equal("bar"))
-}
-
 func TestUnmarshalNull(t *testing.T) {
 	t.Parallel()
 	g := NewWithT(t)

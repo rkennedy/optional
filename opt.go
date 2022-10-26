@@ -57,10 +57,6 @@ func (o Value[T]) Present() bool {
 	return o.value != nil
 }
 
-func (o *Value[T]) Set(v T) {
-	o.value = &v
-}
-
 func (o *Value[T]) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		o.value = nil
