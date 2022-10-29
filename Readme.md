@@ -17,5 +17,13 @@ go get github.com/rkennedy/optional
 import github.com/rkennedy/optional
 ```
 
+```go
+full := optional.New(42)
+empty := optional.Value[int]{}
+
+fmt.Printf("full: %v\n", full)  // Output: 42
+fmt.Printf("empty: %v\n", empty) // Output: None
+```
+
 [java-opt]: https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
 [std-opt]: https://en.cppreference.com/w/cpp/utility/optional

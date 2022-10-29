@@ -165,3 +165,46 @@ func TestUnmarshalInt(t *testing.T) {
 		g.Expect(o.Present()).To(BeFalse())
 	})
 }
+
+func TestGoStringFull(t *testing.T) {
+	t.Parallel()
+	t.Run("int", func(t *testing.T) {
+		t.Parallel()
+		g := NewWithT(t)
+		o := New(42)
+		g.Expect(fmt.Sprintf("%#v", o)).To(Equal("optional.Value[int]{42}"))
+	})
+	t.Run("string", func(t *testing.T) {
+		t.Parallel()
+		g := NewWithT(t)
+		o := New("foo")
+		g.Expect(fmt.Sprintf("%#v", o)).To(Equal(`optional.Value[string]{"foo"}`))
+	})
+}
+
+func TestStringizeFull(t *testing.T) {
+	t.Parallel()
+
+	t.Run("int", func(t *testing.T) {
+		t.Parallel()
+		g := NewWithT(t)
+
+		o := New(42)
+		g.Expect(fmt.Sprintf("%v", o)).To(Equal(`42`))
+	})
+	t.Run("string", func(t *testing.T) {
+		t.Parallel()
+		g := NewWithT(t)
+
+		o := New("foo")
+		g.Expect(fmt.Sprintf("%v", o)).To(Equal(`foo`))
+	})
+}
+
+func TestStringizeEmpty(t *testing.T) {
+	t.Parallel()
+	g := NewWithT(t)
+
+	var o Value[int]
+	g.Expect(fmt.Sprintf("%v", o)).To(Equal(`None`))
+}

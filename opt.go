@@ -6,16 +6,31 @@ package optional
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 // ErrEmpty indicates that an optional value was empty when its value was requested.
 var ErrEmpty = errors.New("value not present")
 
 // Value is a type that may or may not hold a value. Its interface is modeled
-// on Java's java.util.Optional type and C++'s std::optional.
+// on Java's [java.util.Optional] type and C++'s [std::optional].
+//
+// Value implements the following interfaces:
+//   - [fmt.GoStringer]
+//   - [fmt.Stringer]
+//   - [json.Marshaler]
+//   - [json.Unmarshaler]
+//
+// [java.util.Optional]: https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
+// [std::optional]: https://en.cppreference.com/w/cpp/utility/optional
 type Value[T any] struct {
 	value *T
 }
+
+var _ fmt.GoStringer = &Value[any]{}
+var _ fmt.Stringer = &Value[any]{}
+var _ json.Marshaler = &Value[any]{}
+var _ json.Unmarshaler = &Value[any]{}
 
 // New creates a new Value holding the given value.
 func New[T any](v T) Value[T] {
@@ -89,4 +104,22 @@ func (o *Value[T]) UnmarshalJSON(data []byte) error {
 
 	o.value = &value
 	return nil
+}
+
+// GoString fornats the Value as Go code, providing an implementation for the
+// %#v format string.
+func (o Value[T]) GoString() string {
+	if o.Present() {
+		return fmt.Sprintf("%T{%#v}", o, *o.value)
+	}
+	return fmt.Sprintf("%T{}", o)
+}
+
+// String returns the string representation of the stored value, if present.
+// Otherwise, it returns None.
+func (o Value[T]) String() string {
+	if o.Present() {
+		return fmt.Sprintf("%v", *o.value)
+	}
+	return "None"
 }
