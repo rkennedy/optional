@@ -208,3 +208,27 @@ func TestStringizeEmpty(t *testing.T) {
 	var o Value[int]
 	g.Expect(fmt.Sprintf("%v", o)).To(Equal(`None`))
 }
+
+func TestTransformSameType(t *testing.T) {
+	t.Parallel()
+	g := NewWithT(t)
+
+	o := New(4)
+	g.Expect(Transform(o, func(i int) int { return i + 1 }).Get()).To(Equal(5))
+}
+
+func TestTransformDifferentType(t *testing.T) {
+	t.Parallel()
+	g := NewWithT(t)
+
+	o := New(4)
+	g.Expect(Transform(o, func(i int) string { return fmt.Sprintf("%v", i) }).Get()).To(Equal("4"))
+}
+
+func TestTransformEmpty(t *testing.T) {
+	t.Parallel()
+	g := NewWithT(t)
+
+	var o Value[int]
+	g.Expect(Transform(o, func(i int) int { return i + 1 }).Present()).To(BeFalse())
+}

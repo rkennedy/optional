@@ -123,3 +123,14 @@ func (o Value[T]) String() string {
 	}
 	return "None"
 }
+
+// Transform applies the given function to the optional value if the input
+// value is non-empty, and returns a new optional of the corresponding return
+// type holding the returned value. Returns an empty value if the input is
+// empty.
+func Transform[T, U any](in Value[T], fn func(T) U) Value[U] {
+	if in.Present() {
+		return New(fn(*in.value))
+	}
+	return Value[U]{}
+}
