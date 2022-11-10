@@ -42,6 +42,7 @@ g() {
         --env GOCACHE="${cache_path}/go"
         --env GOMODCACHE="${cache_path}/mod"
         --env CGO_ENABLED=0
+        --label role=builder
         --workdir /src
         "${golang}"
     )
