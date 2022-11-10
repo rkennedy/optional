@@ -59,6 +59,7 @@ if ! podman volume exists "${cache_volume}"; then
 fi
 
 g sh -x <<END
+set -euo pipefail
 if ${update}; then
     go get -u
 fi
@@ -67,7 +68,7 @@ go mod tidy -go 1.19
 if ! test -x "${cache_path}/bin/goimports"; then
     go install golang.org/x/tools/cmd/goimports
 fi
-"${cache_path}/bin/goimports" -w .
+"${cache_path}/bin/goimports" -w -l .
 go vet
 go test ./...
 END
