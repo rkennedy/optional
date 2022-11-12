@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/rkennedy/optional"
+	opt "github.com/rkennedy/optional/testing"
 )
 
 func TestCreateEmpty(t *testing.T) {
@@ -214,7 +215,7 @@ func TestTransformSameType(t *testing.T) {
 	g := NewWithT(t)
 
 	o := New(4)
-	g.Expect(Transform(o, func(i int) int { return i + 1 }).Get()).To(Equal(5))
+	g.Expect(Transform(o, func(i int) int { return i + 1 })).To(opt.HaveValue(5))
 }
 
 func TestTransformDifferentType(t *testing.T) {
@@ -222,7 +223,7 @@ func TestTransformDifferentType(t *testing.T) {
 	g := NewWithT(t)
 
 	o := New(4)
-	g.Expect(Transform(o, func(i int) string { return fmt.Sprintf("%v", i) }).Get()).To(Equal("4"))
+	g.Expect(Transform(o, func(i int) string { return fmt.Sprintf("%v", i) })).To(opt.HaveValue("4"))
 }
 
 func TestTransformEmpty(t *testing.T) {
@@ -230,5 +231,5 @@ func TestTransformEmpty(t *testing.T) {
 	g := NewWithT(t)
 
 	var o Value[int]
-	g.Expect(Transform(o, func(i int) int { return i + 1 }).Present()).To(BeFalse())
+	g.Expect(Transform(o, func(i int) int { return i + 1 })).To(opt.BeEmpty[int]())
 }
