@@ -134,3 +134,19 @@ func Transform[T, U any](in Value[T], fn func(T) U) Value[U] {
 	}
 	return Value[U]{}
 }
+
+// TransformWithError applies the given function to the optional value if the
+// input value is non-empty, and returns a new optional of the corresponding
+// return type holding the returned value. Returns an empty value if the input
+// is empty. If the transform function returns an error, then an empty value
+// and that error are returned.
+func TransformWithError[T, U any](in Value[T], fn func(T) (U, error)) (result Value[U], err error) {
+	in.If(func(val T) {
+		var newVal U
+		newVal, err = fn(*in.value)
+		if err == nil {
+			result.value = &newVal
+		}
+	})
+	return result, err
+}

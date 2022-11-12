@@ -1,6 +1,7 @@
 package optional_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -234,6 +235,64 @@ func TestTransform(t *testing.T) {
 		g := NewWithT(t)
 
 		var o Value[int]
-		g.Expect(Transform(o, func(i int) int { return i + 1 })).To(opt.BeEmpty[int]())
+		g.Expect(Transform(o, func(i int) int { return i + 1 })).
+			To(opt.BeEmpty[int]())
+	})
+}
+
+func TestTransformWithError(t *testing.T) {
+	t.Parallel()
+	err := errors.New("test error sentinel")
+
+	t.Run("same type", func(t *testing.T) {
+		t.Parallel()
+		o := New(4)
+
+		t.Run("without error", func(t *testing.T) {
+			t.Parallel()
+			g := NewWithT(t)
+			g.Expect(TransformWithError(o, func(i int) (int, error) { return i + 1, nil })).
+				To(opt.HaveValue(5))
+		})
+		t.Run("with error", func(t *testing.T) {
+			t.Parallel()
+			g := NewWithT(t)
+			g.Expect(TransformWithError(o, func(i int) (int, error) { return i + 1, err })).
+				Error().To(MatchError(err))
+		})
+	})
+	t.Run("different type", func(t *testing.T) {
+		t.Parallel()
+		o := New(4)
+
+		t.Run("without error", func(t *testing.T) {
+			t.Parallel()
+			g := NewWithT(t)
+			g.Expect(TransformWithError(o, func(i int) (string, error) { return fmt.Sprintf("%v", i), nil })).
+				To(opt.HaveValue("4"))
+		})
+		t.Run("with error", func(t *testing.T) {
+			t.Parallel()
+			g := NewWithT(t)
+			g.Expect(TransformWithError(o, func(i int) (string, error) { return fmt.Sprintf("%v", i), err })).
+				Error().To(MatchError(err))
+		})
+	})
+	t.Run("empty", func(t *testing.T) {
+		t.Parallel()
+		var o Value[int]
+
+		t.Run("without error", func(t *testing.T) {
+			t.Parallel()
+			g := NewWithT(t)
+			g.Expect(TransformWithError(o, func(i int) (int, error) { return i + 1, nil })).
+				To(opt.BeEmpty[int]())
+		})
+		t.Run("with error", func(t *testing.T) {
+			t.Parallel()
+			g := NewWithT(t)
+			g.Expect(TransformWithError(o, func(i int) (int, error) { return i + 1, err })).
+				To(opt.BeEmpty[int]())
+		})
 	})
 }
