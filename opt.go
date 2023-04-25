@@ -83,6 +83,17 @@ func (o Value[T]) OrElse(v T) T {
 	return v
 }
 
+// OrElseGet returns the stored value, if there is one. If the Value is empty,
+// then OrElseGet calls the given function and returns the result. Use this
+// instead of OrElse when calculation of the fallback value is relatively
+// expensive. It will only be calculated when needed.
+func (o Value[T]) OrElseGet(calculateFallback func() T) T {
+	if o.Present() {
+		return *o.value
+	}
+	return calculateFallback()
+}
+
 // Present returns true if there is a value stored, false if the Value is empty.
 func (o Value[T]) Present() bool {
 	return o.value != nil

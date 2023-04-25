@@ -124,7 +124,7 @@ func TestMarshal(t *testing.T) {
 	})
 }
 
-func TestOrElseEmpty(t *testing.T) {
+func TestOrElse(t *testing.T) {
 	t.Parallel()
 	t.Run("empty", func(t *testing.T) {
 		t.Parallel()
@@ -139,6 +139,36 @@ func TestOrElseEmpty(t *testing.T) {
 
 		o := New('q')
 		g.Expect(o.OrElse('r')).To(Equal('q'))
+	})
+}
+
+func TestOrElseGet(t *testing.T) {
+	t.Parallel()
+	t.Run("empty", func(t *testing.T) {
+		t.Parallel()
+		g := NewWithT(t)
+
+		var o Value[float64]
+		var calls int
+		fallback := func() float64 {
+			calls++
+			return 2.5
+		}
+		g.Expect(o.OrElseGet(fallback)).To(Equal(2.5))
+		g.Expect(calls).To(Equal(1))
+	})
+	t.Run("full", func(t *testing.T) {
+		t.Parallel()
+		g := NewWithT(t)
+
+		o := New(3.5)
+		var calls int
+		fallback := func() float64 {
+			calls++
+			return 2.5
+		}
+		g.Expect(o.OrElseGet(fallback)).To(Equal(3.5))
+		g.Expect(calls).To(Equal(0))
 	})
 }
 
