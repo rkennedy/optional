@@ -1,4 +1,4 @@
-// Package optional provides an _option type_, which can either be empty or
+// Package optional provides an “option type,” which can either be empty or
 // hold a value. In that respect, it's very similar to an ordinary pointer
 // type, except it has methods that make its possible emptiness more explicit.
 package optional
