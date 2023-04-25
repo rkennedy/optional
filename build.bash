@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 readonly script_dir
 readonly cache_volume=go-cache-optional
-readonly golang=docker.io/library/golang:1.19.2-alpine
+readonly golang=docker.io/library/golang:1.20.2-alpine
 
 readonly cache_path=/go-cache
 
@@ -63,7 +63,7 @@ set -euo pipefail
 if ${update}; then
     go get -u
 fi
-go mod tidy -go 1.19
+go mod tidy -go 1.20
 # TODO Check that goimports is the matching version.
 if ! test -x "${cache_path}/bin/goimports"; then
     go install golang.org/x/tools/cmd/goimports

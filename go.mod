@@ -1,6 +1,6 @@
 module github.com/rkennedy/optional
 
-go 1.19
+go 1.20
 
 require (
 	github.com/onsi/gomega v1.24.1
