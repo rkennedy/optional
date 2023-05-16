@@ -1,3 +1,4 @@
+// Package testing provides Gomega matchers for use with [optional.Value] values.
 package testing
 
 import (
@@ -9,12 +10,14 @@ import (
 	"github.com/rkennedy/optional"
 )
 
+// BeEmpty asserts that the tested value is an empty [optional.Value] with type T.
 func BeEmpty[T any]() types.GomegaMatcher {
 	return gcustom.MakeMatcher(func(opt optional.Value[T]) (bool, error) {
 		return !opt.Present(), nil
 	}).WithMessage("be empty")
 }
 
+// HaveValue asserts that the tested value is a non-empty [optional.Value] holding a value equal to the argument.
 func HaveValue[T any](arg T) types.GomegaMatcher {
 	return gcustom.
 		MakeMatcher(func(opt optional.Value[T]) (bool, error) {
