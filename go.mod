@@ -3,9 +3,11 @@ module github.com/rkennedy/optional
 go 1.20
 
 require (
+	github.com/deckarep/golang-set/v2 v2.3.0
 	github.com/magefile/mage v1.15.0
 	github.com/mgechev/revive v1.3.1
 	github.com/onsi/gomega v1.24.1
+	github.com/rkennedy/magehelper v0.0.0-20230527005329-ed823280ed9c
 	golang.org/x/mod v0.10.0
 	golang.org/x/tools v0.8.0
 )

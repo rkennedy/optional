@@ -11,16 +11,21 @@ import (
 	opt "github.com/rkennedy/optional/testing"
 )
 
+const (
+	emptyCase = "empty"
+	fullCase  = "full"
+)
+
 func TestCreate(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
 		var o Value[string]
 		g.Expect(o.Present()).To(BeFalse())
 	})
-	t.Run("full", func(t *testing.T) {
+	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -31,14 +36,14 @@ func TestCreate(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
 		var o Value[int]
 		g.Expect(o.Get()).Error().To(MatchError(ErrEmpty))
 	})
-	t.Run("full", func(t *testing.T) {
+	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -49,14 +54,14 @@ func TestGet(t *testing.T) {
 
 func TestMustGet(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
 		var o Value[float64]
 		g.Expect(func() { o.MustGet() }).To(PanicWith(ErrEmpty))
 	})
-	t.Run("full", func(t *testing.T) {
+	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -67,7 +72,7 @@ func TestMustGet(t *testing.T) {
 
 func TestIf(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 
 		var o Value[any]
@@ -75,7 +80,7 @@ func TestIf(t *testing.T) {
 			t.Fail()
 		})
 	})
-	t.Run("full", func(t *testing.T) {
+	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -91,7 +96,7 @@ func TestIf(t *testing.T) {
 
 func TestMarshal(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -99,7 +104,7 @@ func TestMarshal(t *testing.T) {
 		b, err := o.MarshalJSON()
 		g.Expect(string(b), err).To(Equal("null"))
 	})
-	t.Run("full", func(t *testing.T) {
+	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 
 		cases := []struct {
@@ -126,14 +131,14 @@ func TestMarshal(t *testing.T) {
 
 func TestOrElse(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
 		var o Value[rune]
 		g.Expect(o.OrElse('r')).To(Equal('r'))
 	})
-	t.Run("full", func(t *testing.T) {
+	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -144,7 +149,7 @@ func TestOrElse(t *testing.T) {
 
 func TestOrElseGet(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -157,7 +162,7 @@ func TestOrElseGet(t *testing.T) {
 		g.Expect(o.OrElseGet(fallback)).To(Equal(2.5))
 		g.Expect(calls).To(Equal(1))
 	})
-	t.Run("full", func(t *testing.T) {
+	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -233,7 +238,7 @@ func TestStringize(t *testing.T) {
 		o := New("foo")
 		g.Expect(fmt.Sprintf("%v", o)).To(Equal(`foo`))
 	})
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -260,7 +265,7 @@ func TestTransform(t *testing.T) {
 		g.Expect(Transform(o, func(i int) string { return fmt.Sprintf("%v", i) })).
 			To(opt.HaveValue("4"))
 	})
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
@@ -270,6 +275,7 @@ func TestTransform(t *testing.T) {
 	})
 }
 
+//revive:disable-next-line:cognitive-complexity
 func TestTransformWithError(t *testing.T) {
 	t.Parallel()
 	err := errors.New("test error sentinel")
@@ -308,7 +314,7 @@ func TestTransformWithError(t *testing.T) {
 				Error().To(MatchError(err))
 		})
 	})
-	t.Run("empty", func(t *testing.T) {
+	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
 		var o Value[int]
 
