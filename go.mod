@@ -7,8 +7,7 @@ require (
 	github.com/magefile/mage v1.15.0
 	github.com/mgechev/revive v1.3.1
 	github.com/onsi/gomega v1.24.1
-	github.com/rkennedy/magehelper v0.0.0-20230527005329-ed823280ed9c
-	golang.org/x/mod v0.10.0
+	github.com/rkennedy/magehelper v0.0.0-20230605195436-8ce85ce8e3fa
 	golang.org/x/tools v0.8.0
 )
 
@@ -25,6 +24,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
