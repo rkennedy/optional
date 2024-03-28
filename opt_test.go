@@ -76,7 +76,7 @@ func TestIf(t *testing.T) {
 		t.Parallel()
 
 		var o Value[any]
-		o.If(func(a any) {
+		o.If(func(any) {
 			t.Fail()
 		})
 	})

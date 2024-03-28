@@ -7,12 +7,9 @@ import (
 	"context"
 	"fmt"
 	"path"
-	"path/filepath"
 
-	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/magefile/mage/target"
 	"github.com/rkennedy/magehelper"
 )
 
@@ -38,36 +35,6 @@ func Imports(ctx context.Context) error {
 	return sh.RunV(goimportsBin(), "-w", "-l", ".")
 }
 
-func getDependencies(
-	baseMod string,
-	files func(pkg magehelper.Package) []string,
-	imports func(pkg magehelper.Package) []string,
-) (result []string) {
-	processedPackages := mapset.NewThreadUnsafeSetWithSize[string](len(magehelper.Packages))
-	worklist := mapset.NewSet(baseMod)
-
-	for current, ok := worklist.Pop(); ok; current, ok = worklist.Pop() {
-		if processedPackages.Add(current) {
-			if pkg, ok := magehelper.Packages[current]; ok {
-				result = append(result, expandFiles(pkg, files)...)
-				worklist.Append(imports(pkg)...)
-			}
-		}
-	}
-	return result
-}
-
-func expandFiles(
-	pkg magehelper.Package,
-	files func(pkg magehelper.Package) []string,
-) []string {
-	var result []string
-	for _, gofile := range files(pkg) {
-		result = append(result, filepath.Join(pkg.Dir, gofile))
-	}
-	return result
-}
-
 // Lint performs static analysis on all the code in the project.
 func Lint(ctx context.Context) error {
 	mg.CtxDeps(ctx,
@@ -89,25 +56,7 @@ func Test(ctx context.Context) error {
 
 // BuildTest builds the specified package's test.
 func BuildTest(ctx context.Context, pkg string) error {
-	mg.CtxDeps(ctx, magehelper.LoadDependencies)
-	deps := getDependencies(pkg, (magehelper.Package).TestFiles, (magehelper.Package).TestImportPackages)
-	if len(deps) == 0 {
-		return nil
-	}
-
-	info := magehelper.Packages[pkg]
-	exe := filepath.Join(info.Dir, info.Name+".test")
-
-	newer, err := target.Path(exe, deps...)
-	if err != nil || !newer {
-		return err
-	}
-	return sh.RunV(
-		mg.GoCmd(),
-		"test",
-		"-c",
-		"-o", exe,
-		pkg)
+	return magehelper.BuildTest(ctx, pkg)
 }
 
 // RunTest runs the specified package's tests.

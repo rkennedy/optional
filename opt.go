@@ -154,7 +154,7 @@ func Transform[T, U any](in Value[T], fn func(T) U) Value[U] {
 func TransformWithError[T, U any](in Value[T], fn func(T) (U, error)) (result Value[U], err error) {
 	in.If(func(val T) {
 		var newVal U
-		newVal, err = fn(*in.value)
+		newVal, err = fn(val)
 		if err == nil {
 			result.value = &newVal
 		}
