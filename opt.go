@@ -20,6 +20,7 @@ var ErrEmpty = errors.New("value not present")
 //   - [fmt.Stringer]
 //   - [json.Marshaler]
 //   - [json.Unmarshaler]
+//   - [optional.ValueHaver]
 //
 // [java.util.Optional]: https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
 // [std::optional]: https://en.cppreference.com/w/cpp/utility/optional
@@ -31,6 +32,7 @@ var _ fmt.GoStringer = &Value[any]{}
 var _ fmt.Stringer = &Value[any]{}
 var _ json.Marshaler = &Value[any]{}
 var _ json.Unmarshaler = &Value[any]{}
+var _ ValueHaver = &Value[any]{}
 
 // New creates a new Value holding the given value.
 func New[T any](v T) Value[T] {
@@ -94,8 +96,13 @@ func (o Value[T]) OrElseGet(calculateFallback func() T) T {
 	return calculateFallback()
 }
 
+// ValueHaver is a type-neutral interface for [optional.Value] to indicate whether it currently holds a value.
+type ValueHaver interface {
+	Present() bool
+}
+
 // Present returns true if there is a value stored, false if the Value is empty.
-func (o Value[T]) Present() bool {
+func (o Value[_]) Present() bool {
 	return o.value != nil
 }
 

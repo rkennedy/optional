@@ -23,14 +23,14 @@ func TestCreate(t *testing.T) {
 		g := NewWithT(t)
 
 		var o Value[string]
-		g.Expect(o.Present()).To(BeFalse())
+		g.Expect(o).To(opt.BeEmpty())
 	})
 	t.Run(fullCase, func(t *testing.T) {
 		t.Parallel()
 		g := NewWithT(t)
 
 		o := New("foo")
-		g.Expect(o.Present()).To(BeTrue())
+		g.Expect(o).NotTo(opt.BeEmpty())
 	})
 }
 
@@ -117,13 +117,12 @@ func TestMarshal(t *testing.T) {
 			{"foo", `"foo"`},
 		}
 		for _, value := range cases {
-			input, marshal := value.Input, value.Marshal
-			t.Run(fmt.Sprintf("%v", input), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%v", value.Input), func(t *testing.T) {
 				t.Parallel()
 				g := NewWithT(t)
-				o := New(input)
+				o := New(value.Input)
 				b, err := o.MarshalJSON()
-				g.Expect(string(b), err).To(Equal(marshal))
+				g.Expect(string(b), err).To(Equal(value.Marshal))
 			})
 		}
 	})
@@ -185,7 +184,7 @@ func TestUnmarshal(t *testing.T) {
 
 		var o Value[int]
 		g.Expect(o.UnmarshalJSON([]byte(`null`))).To(Succeed())
-		g.Expect(o).To(opt.BeEmpty[int]())
+		g.Expect(o).To(opt.BeEmpty())
 	})
 	t.Run("right type", func(t *testing.T) {
 		t.Parallel()
@@ -193,7 +192,7 @@ func TestUnmarshal(t *testing.T) {
 
 		var o Value[int]
 		g.Expect(o.UnmarshalJSON([]byte(`1`))).To(Succeed())
-		g.Expect(o).To(opt.HaveValue(1))
+		g.Expect(o).To(opt.HaveValueEqualing(1))
 	})
 	t.Run("wrong type", func(t *testing.T) {
 		t.Parallel()
@@ -201,7 +200,7 @@ func TestUnmarshal(t *testing.T) {
 
 		var o Value[int]
 		g.Expect(o.UnmarshalJSON([]byte(`true`))).Error().To(HaveOccurred())
-		g.Expect(o).To(opt.BeEmpty[int]())
+		g.Expect(o).To(opt.BeEmpty())
 	})
 }
 
@@ -255,7 +254,7 @@ func TestTransform(t *testing.T) {
 
 		o := New(4)
 		g.Expect(Transform(o, func(i int) int { return i + 1 })).
-			To(opt.HaveValue(5))
+			To(opt.HaveValueEqualing(5))
 	})
 	t.Run("different type", func(t *testing.T) {
 		t.Parallel()
@@ -263,7 +262,7 @@ func TestTransform(t *testing.T) {
 
 		o := New(4)
 		g.Expect(Transform(o, func(i int) string { return fmt.Sprintf("%v", i) })).
-			To(opt.HaveValue("4"))
+			To(opt.HaveValueEqualing("4"))
 	})
 	t.Run(emptyCase, func(t *testing.T) {
 		t.Parallel()
@@ -271,7 +270,7 @@ func TestTransform(t *testing.T) {
 
 		var o Value[int]
 		g.Expect(Transform(o, func(i int) int { return i + 1 })).
-			To(opt.BeEmpty[int]())
+			To(opt.BeEmpty())
 	})
 }
 
@@ -288,7 +287,7 @@ func TestTransformWithError(t *testing.T) {
 			t.Parallel()
 			g := NewWithT(t)
 			g.Expect(TransformWithError(o, func(i int) (int, error) { return i + 1, nil })).
-				To(opt.HaveValue(5))
+				To(opt.HaveValueEqualing(5))
 		})
 		t.Run("with error", func(t *testing.T) {
 			t.Parallel()
@@ -305,7 +304,7 @@ func TestTransformWithError(t *testing.T) {
 			t.Parallel()
 			g := NewWithT(t)
 			g.Expect(TransformWithError(o, func(i int) (string, error) { return fmt.Sprintf("%v", i), nil })).
-				To(opt.HaveValue("4"))
+				To(opt.HaveValueEqualing("4"))
 		})
 		t.Run("with error", func(t *testing.T) {
 			t.Parallel()
@@ -322,13 +321,13 @@ func TestTransformWithError(t *testing.T) {
 			t.Parallel()
 			g := NewWithT(t)
 			g.Expect(TransformWithError(o, func(i int) (int, error) { return i + 1, nil })).
-				To(opt.BeEmpty[int]())
+				To(opt.BeEmpty())
 		})
 		t.Run("with error", func(t *testing.T) {
 			t.Parallel()
 			g := NewWithT(t)
 			g.Expect(TransformWithError(o, func(i int) (int, error) { return i + 1, err })).
-				To(opt.BeEmpty[int]())
+				To(opt.BeEmpty())
 		})
 	})
 }
