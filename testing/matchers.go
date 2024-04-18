@@ -3,7 +3,6 @@ package testing
 
 import (
 	"github.com/onsi/gomega"
-	"github.com/onsi/gomega/matchers"
 	"github.com/onsi/gomega/types"
 
 	"github.com/rkennedy/optional"
@@ -30,14 +29,10 @@ func get[T any](arg optional.Value[T]) (T, error) {
 //
 //	Expect(v).To(HaveValueMatching[string](Not(HaveLen(3))))
 func HaveValueMatching[T any](matcher types.GomegaMatcher) types.GomegaMatcher {
-	return &matchers.AndMatcher{
-		Matchers: []types.GomegaMatcher{
-			&matchers.NotMatcher{
-				Matcher: BeEmpty(),
-			},
-			matchers.NewWithTransformMatcher(get[T], matcher),
-		},
-	}
+	return gomega.And(
+		gomega.Not(BeEmpty()),
+		gomega.WithTransform(get[T], matcher),
+	)
 }
 
 // HaveValueEqualing checks wheter an [optional.Value] holds a value equal to the given value. Be careful when negating
@@ -50,12 +45,5 @@ func HaveValueMatching[T any](matcher types.GomegaMatcher) types.GomegaMatcher {
 //
 //	Expect(v).To(HaveValueMatching[int](Not(Equal(3))))
 func HaveValueEqualing[T any](arg T) types.GomegaMatcher {
-	return &matchers.AndMatcher{
-		Matchers: []types.GomegaMatcher{
-			&matchers.NotMatcher{
-				Matcher: BeEmpty(),
-			},
-			matchers.NewWithTransformMatcher(get[T], &matchers.EqualMatcher{Expected: arg}),
-		},
-	}
+	return HaveValueMatching[T](gomega.Equal(arg))
 }
