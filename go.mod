@@ -9,7 +9,7 @@ require (
 	github.com/mgechev/revive v1.3.7
 	github.com/onsi/gomega v1.27.7
 	github.com/rkennedy/magehelper v0.0.0-20240328015815-aefddc503669
-	golang.org/x/tools v0.19.0
+	golang.org/x/tools v0.20.0
 )
 
 require (
@@ -28,9 +28,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
-	golang.org/x/mod v0.16.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
