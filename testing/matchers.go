@@ -2,53 +2,15 @@
 package testing
 
 import (
-	"fmt"
-	"reflect"
-
-	"github.com/onsi/gomega/format"
+	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/matchers"
 	"github.com/onsi/gomega/types"
 
 	"github.com/rkennedy/optional"
 )
 
-// EmptyMatcher is a Gomega matcher that checks whether an [optional.Value] is empty.
-type EmptyMatcher struct {
-}
-
-var _ types.GomegaMatcher = &EmptyMatcher{}
-
-// Match implements [types.GomegaMatcher]'s Match function.
-func (*EmptyMatcher) Match(actual any) (bool, error) {
-	opt, ok := actual.(optional.ValueHaver)
-	if !ok {
-		return false, fmt.Errorf("to have type %s", reflect.TypeFor[optional.ValueHaver]().String())
-	}
-	return !opt.Present(), nil
-}
-
-// FailureMessage implements [types.GomegaMatcher]'s FailureMessage function.
-func (*EmptyMatcher) FailureMessage(actual any) string {
-	_, ok := actual.(optional.ValueHaver)
-	if !ok {
-		return format.Message(actual, "to be an optional.Value", fmt.Sprintf("got type %T", actual))
-	}
-	return format.Message(actual, "not to hold a value")
-}
-
-// NegatedFailureMessage implements [types.GomegaMatcher]'s NegatedFailureMessage function.
-func (*EmptyMatcher) NegatedFailureMessage(actual any) string {
-	_, ok := actual.(optional.ValueHaver)
-	if !ok {
-		return format.Message(actual, "to be an optional.Value", fmt.Sprintf("got type %T", actual))
-	}
-	return format.Message(actual, "to hold a value")
-}
-
 // BeEmpty asserts that the tested value is an empty [optional.Value] with type T.
-func BeEmpty() types.GomegaMatcher {
-	return &EmptyMatcher{}
-}
+var BeEmpty = gomega.BeEmpty
 
 func get[T any](arg optional.Value[T]) (T, error) {
 	return arg.Get()
@@ -71,7 +33,7 @@ func HaveValueMatching[T any](matcher types.GomegaMatcher) types.GomegaMatcher {
 	return &matchers.AndMatcher{
 		Matchers: []types.GomegaMatcher{
 			&matchers.NotMatcher{
-				Matcher: &EmptyMatcher{},
+				Matcher: BeEmpty(),
 			},
 			matchers.NewWithTransformMatcher(get[T], matcher),
 		},
@@ -91,7 +53,7 @@ func HaveValueEqualing[T any](arg T) types.GomegaMatcher {
 	return &matchers.AndMatcher{
 		Matchers: []types.GomegaMatcher{
 			&matchers.NotMatcher{
-				Matcher: &EmptyMatcher{},
+				Matcher: BeEmpty(),
 			},
 			matchers.NewWithTransformMatcher(get[T], &matchers.EqualMatcher{Expected: arg}),
 		},

@@ -38,7 +38,7 @@ func TestEmptyFailureMessage(t *testing.T) {
 	vi := optional.New(1)
 	m := opt.BeEmpty()
 	g.Expect(m.Match(vi)).To(BeFalse())
-	g.Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int]>: {value: 1}\nnot to hold a value"))
+	g.Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int] | len:1, cap:1>: [1]\nto be empty"))
 }
 
 func TestEmptyUnexpectedFailureMessage(t *testing.T) {
@@ -48,7 +48,7 @@ func TestEmptyUnexpectedFailureMessage(t *testing.T) {
 	vi := optional.Value[int]{}
 	m := Not(opt.BeEmpty())
 	g.Expect(m.Match(vi)).To(BeFalse())
-	g.Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int]>: {value: nil}\nto hold a value"))
+	g.Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int] | len:0, cap:0>: []\nnot to be empty"))
 }
 
 func TestHaveValue(t *testing.T) {
@@ -90,7 +90,7 @@ func TestEmptyHaveValue(t *testing.T) {
 
 	m := opt.HaveValueEqualing(1)
 	g.Expect(m.Match(vi)).To(BeFalse())
-	g.Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int]>: {value: nil}\nto hold a value"))
+	g.Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int] | len:0, cap:0>: []\nnot to be empty"))
 }
 
 func TestHaveValueFailureMessage(t *testing.T) {

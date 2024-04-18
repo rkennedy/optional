@@ -20,25 +20,19 @@ var ErrEmpty = errors.New("value not present")
 //   - [fmt.Stringer]
 //   - [json.Marshaler]
 //   - [json.Unmarshaler]
-//   - [optional.ValueHaver]
 //
 // [java.util.Optional]: https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
 // [std::optional]: https://en.cppreference.com/w/cpp/utility/optional
-type Value[T any] struct {
-	value *T
-}
+type Value[T any] []T
 
 var _ fmt.GoStringer = &Value[any]{}
 var _ fmt.Stringer = &Value[any]{}
 var _ json.Marshaler = &Value[any]{}
 var _ json.Unmarshaler = &Value[any]{}
-var _ ValueHaver = &Value[any]{}
 
 // New creates a new Value holding the given value.
 func New[T any](v T) Value[T] {
-	return Value[T]{
-		value: &v,
-	}
+	return []T{v}
 }
 
 // Get returns the current value, if there is one. If the Value is empty, then
@@ -47,7 +41,7 @@ func (o Value[T]) Get() (result T, err error) {
 	if !o.Present() {
 		return result, ErrEmpty
 	}
-	return *o.value, nil
+	return o[0], nil
 }
 
 // MustGet returns the current value, if there is one. If the Value is empty,
@@ -56,14 +50,14 @@ func (o Value[T]) MustGet() T {
 	if !o.Present() {
 		panic(ErrEmpty)
 	}
-	return *o.value
+	return o[0]
 }
 
 // If calls the given function if the Value holds a value. If Value is empty,
 // then If is a no-op.
 func (o Value[T]) If(fn func(T)) {
 	if o.Present() {
-		fn(*o.value)
+		fn(o[0])
 	}
 }
 
@@ -71,7 +65,7 @@ func (o Value[T]) If(fn func(T)) {
 // the JSON result is null.
 func (o Value[T]) MarshalJSON() ([]byte, error) {
 	if o.Present() {
-		return json.Marshal(o.value)
+		return json.Marshal(o[0])
 	}
 	return json.Marshal(nil)
 }
@@ -80,7 +74,7 @@ func (o Value[T]) MarshalJSON() ([]byte, error) {
 // then OrElse returns the given argument.
 func (o Value[T]) OrElse(v T) T {
 	if o.Present() {
-		return *o.value
+		return o[0]
 	}
 	return v
 }
@@ -91,19 +85,14 @@ func (o Value[T]) OrElse(v T) T {
 // expensive. It will only be calculated when needed.
 func (o Value[T]) OrElseGet(calculateFallback func() T) T {
 	if o.Present() {
-		return *o.value
+		return o[0]
 	}
 	return calculateFallback()
 }
 
-// ValueHaver is a type-neutral interface for [optional.Value] to indicate whether it currently holds a value.
-type ValueHaver interface {
-	Present() bool
-}
-
 // Present returns true if there is a value stored, false if the Value is empty.
 func (o Value[_]) Present() bool {
-	return o.value != nil
+	return len(o) != 0
 }
 
 // UnmarshalJSON converts the given JSON value to an optional Value[T]. If the
@@ -111,7 +100,7 @@ func (o Value[_]) Present() bool {
 // unmarshaled in the same way values of type T are unmarshaled.
 func (o *Value[T]) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
-		o.value = nil
+		*o = []T{}
 		return nil
 	}
 
@@ -120,7 +109,7 @@ func (o *Value[T]) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	o.value = &value
+	*o = []T{value}
 	return nil
 }
 
@@ -128,7 +117,7 @@ func (o *Value[T]) UnmarshalJSON(data []byte) error {
 // %#v format string.
 func (o Value[T]) GoString() string {
 	if o.Present() {
-		return fmt.Sprintf("%T{%#v}", o, *o.value)
+		return fmt.Sprintf("%T{%#v}", o, o[0])
 	}
 	return fmt.Sprintf("%T{}", o)
 }
@@ -137,7 +126,7 @@ func (o Value[T]) GoString() string {
 // Otherwise, it returns None.
 func (o Value[T]) String() string {
 	if o.Present() {
-		return fmt.Sprintf("%v", *o.value)
+		return fmt.Sprintf("%v", o[0])
 	}
 	return "None"
 }
@@ -148,7 +137,7 @@ func (o Value[T]) String() string {
 // empty.
 func Transform[T, U any](in Value[T], fn func(T) U) Value[U] {
 	if in.Present() {
-		return New(fn(*in.value))
+		return New(fn(in[0]))
 	}
 	return Value[U]{}
 }
@@ -163,7 +152,7 @@ func TransformWithError[T, U any](in Value[T], fn func(T) (U, error)) (result Va
 		var newVal U
 		newVal, err = fn(val)
 		if err == nil {
-			result.value = &newVal
+			result = []U{newVal}
 		}
 	})
 	return result, err
