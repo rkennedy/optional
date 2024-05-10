@@ -45,13 +45,7 @@ func Lint(ctx context.Context) error {
 
 // Test runs unit tests.
 func Test(ctx context.Context) error {
-	mg.CtxDeps(ctx, magehelper.LoadDependencies)
-	tests := []any{}
-	for _, info := range magehelper.Packages {
-		tests = append(tests, mg.F(RunTest, info.ImportPath))
-	}
-	mg.CtxDeps(ctx, tests...)
-	return nil
+	return magehelper.Test(ctx)
 }
 
 // BuildTest builds the specified package's test.
@@ -61,20 +55,12 @@ func BuildTest(ctx context.Context, pkg string) error {
 
 // RunTest runs the specified package's tests.
 func RunTest(ctx context.Context, pkg string) error {
-	mg.CtxDeps(ctx, mg.F(BuildTest, pkg))
-
-	return sh.RunV(mg.GoCmd(), "test", "-timeout", "10s", pkg)
+	return magehelper.RunTest(ctx, pkg)
 }
 
 // BuildTests build all the tests.
 func BuildTests(ctx context.Context) error {
-	mg.CtxDeps(ctx, magehelper.LoadDependencies)
-	tests := []any{}
-	for _, mod := range magehelper.Packages {
-		tests = append(tests, mg.F(BuildTest, mod.ImportPath))
-	}
-	mg.CtxDeps(ctx, tests...)
-	return nil
+	return magehelper.BuildTests(ctx)
 }
 
 // Check runs the test and lint targets.
