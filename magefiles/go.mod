@@ -7,7 +7,7 @@ toolchain go1.22.1
 require (
 	github.com/magefile/mage v1.15.0
 	github.com/mgechev/revive v1.3.9
-	github.com/rkennedy/magehelper v0.0.0-20240801182534-77163c3dd6cb
+	github.com/rkennedy/magehelper v0.0.0-20240806152237-b12e01e205e1
 	golang.org/x/tools v0.23.0
 )
 
@@ -30,5 +30,5 @@ require (
 	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/text v0.17.0 // indirect
 )
