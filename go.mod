@@ -1,8 +1,8 @@
 module github.com/rkennedy/optional
 
-go 1.22
+go 1.25
 
-toolchain go1.22.1
+toolchain go1.25.1
 
 require (
 	github.com/onsi/ginkgo/v2 v2.9.5

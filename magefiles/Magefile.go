@@ -50,22 +50,17 @@ func Lint(ctx context.Context) error {
 
 // Test runs unit tests.
 func Test(ctx context.Context) error {
-	return magehelper.Test(ctx)
+	return magehelper.Test().Run(ctx)
 }
 
 // BuildTest builds the specified package's test.
 func BuildTest(ctx context.Context, pkg string) error {
-	return magehelper.BuildTest(ctx, pkg)
-}
-
-// RunTest runs the specified package's tests.
-func RunTest(ctx context.Context, pkg string) error {
-	return magehelper.RunTest(ctx, pkg)
+	return magehelper.BuildTest(pkg).Run(ctx)
 }
 
 // BuildTests build all the tests.
 func BuildTests(ctx context.Context) error {
-	return magehelper.BuildTests(ctx)
+	return magehelper.BuildTests().Run(ctx)
 }
 
 // Check runs the test and lint targets.

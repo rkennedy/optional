@@ -26,14 +26,16 @@ var _ = Describe("Optional matchers", func() {
 			vi := optional.New(1)
 			m := opt.BeEmpty()
 			Expect(m.Match(vi)).To(BeFalse())
-			Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int] | len:1, cap:1>: [1]\nto be empty"))
+			Expect(m.FailureMessage(vi)).To(Equal(
+				"Expected\n    <optional.Value[int] | len:1, cap:1>: [1]\nto be empty"))
 		})
 
 		It("produces a message when empty", func() {
 			vi := optional.Value[int]{}
 			m := Not(opt.BeEmpty())
 			Expect(m.Match(vi)).To(BeFalse())
-			Expect(m.FailureMessage(vi)).To(Equal("Expected\n    <optional.Value[int] | len:0, cap:0>: []\nnot to be empty"))
+			Expect(m.FailureMessage(vi)).To(Equal(
+				"Expected\n    <optional.Value[int] | len:0, cap:0>: []\nnot to be empty"))
 		})
 	})
 
@@ -60,7 +62,8 @@ var _ = Describe("Optional matchers", func() {
 
 			m := opt.HaveValueEqualing(1)
 			Expect(m.Match(o)).To(BeFalse())
-			Expect(m.FailureMessage(o)).To(Equal("Expected\n    <optional.Value[int] | len:0, cap:0>: []\nnot to be empty"))
+			Expect(m.FailureMessage(o)).To(Equal(
+				"Expected\n    <optional.Value[int] | len:0, cap:0>: []\nnot to be empty"))
 		})
 
 		It("produces matcher's message on mismatch", func() {
