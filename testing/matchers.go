@@ -15,9 +15,10 @@ func get[T any](arg optional.Value[T]) (T, error) {
 	return arg.Get()
 }
 
-// HaveValueMatching checks whether an [optional.Value] holds a value that matches the given matcher. Be careful when
-// negating this matcher. You probably don't want to negate this matcher; doing so will cause it to pass either when the
-// value is empty or when the wrapped matcher fails.
+// HaveValueMatching checks whether an [optional.Value] holds a value that matches the given matcher.
+//
+// Be careful when negating this matcher. You probably don't want to negate this matcher; doing so will cause it to pass
+// either when the value is empty or when the wrapped matcher fails.
 //
 //	Expect(v).NotTo(HaveValueMatching[string](HaveLen(3))) // !!! Fails when !v.Present _or_ when len(v.Get()) != 3
 //
@@ -35,8 +36,9 @@ func HaveValueMatching[T any](matcher types.GomegaMatcher) types.GomegaMatcher {
 	)
 }
 
-// HaveValueEqualing checks wheter an [optional.Value] holds a value equal to the given value. Be careful when negating
-// this matcher.
+// HaveValueEqualing checks wheter an [optional.Value] holds a value equal to the given value.
+//
+// Be careful when negating this matcher.
 //
 //	Expect(v).NotTo(HaveValueEqualing(3)) // !!! Fails when !v.Present _or_ when v.Get() != 3
 //
