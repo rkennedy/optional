@@ -5,7 +5,7 @@ import (
 	"github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 
-	"github.com/rkennedy/optional"
+	"sweetkennedy.net/optional"
 )
 
 // BeEmpty asserts that the tested value is an empty [optional.Value] with type T.

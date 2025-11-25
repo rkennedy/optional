@@ -6,8 +6,8 @@ import (
 	"github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"
 
-	"github.com/rkennedy/optional"
-	opt "github.com/rkennedy/optional/testing"
+	"sweetkennedy.net/optional"
+	opt "sweetkennedy.net/optional/testing"
 )
 
 var _ = Describe("Optional matchers", func() {

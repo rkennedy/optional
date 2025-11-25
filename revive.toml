@@ -23,7 +23,7 @@ disabled = true  # We're only using cognitive complexity.
 allowedPackages = [
     "github.com/onsi/ginkgo/v2",
     "github.com/onsi/gomega",
-    "github.com/rkennedy/optional",
+    "sweetkennedy.net/optional",
 ]
 
 [rule.file-header]

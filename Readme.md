@@ -10,11 +10,11 @@ The interface of the `optional.Value` type is modeled on Java's
 # Usage
 
 ```bash
-go get github.com/rkennedy/optional
+go get sweetkennedy.net/optional
 ```
 
 ```go
-import github.com/rkennedy/optional
+import sweetkennedy.net/optional
 ```
 
 ```go

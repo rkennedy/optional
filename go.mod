@@ -1,8 +1,6 @@
-module github.com/rkennedy/optional
+module sweetkennedy.net/optional
 
 go 1.25
-
-toolchain go1.25.1
 
 require (
 	github.com/onsi/ginkgo/v2 v2.25.3

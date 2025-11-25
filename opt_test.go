@@ -7,8 +7,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "github.com/rkennedy/optional"
-	opt "github.com/rkennedy/optional/testing"
+	. "sweetkennedy.net/optional"
+	opt "sweetkennedy.net/optional/testing"
 )
 
 var _ = Describe("Optional", func() {
