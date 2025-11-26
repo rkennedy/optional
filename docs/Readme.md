@@ -1,5 +1,7 @@
 # optional
 
+[![Go Reference](https://pkg.go.dev/badge/sweetkennedy.net/optional.svg)](https://pkg.go.dev/sweetkennedy.net/optional)
+
 The _optional_ package provides an _option type_, which can either be empty or
 hold a value. In that respect, it's very similar to an ordinary pointer type,
 except it has methods that make its possible emptiness more explicit.
@@ -14,7 +16,7 @@ go get sweetkennedy.net/optional
 ```
 
 ```go
-import sweetkennedy.net/optional
+import "sweetkennedy.net/optional"
 ```
 
 ```go
