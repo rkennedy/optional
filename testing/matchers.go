@@ -2,7 +2,11 @@
 package testing
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
 
 	"sweetkennedy.net/optional"
@@ -11,16 +15,13 @@ import (
 // BeEmpty asserts that the tested value is an empty [optional.Value] with type T.
 var BeEmpty = gomega.BeEmpty
 
-func get[T any](arg optional.Value[T]) (T, error) {
-	return arg.Get()
-}
-
 // HaveValueMatching checks whether an [optional.Value] holds a value that matches the given matcher.
 //
-// Be careful when negating this matcher. You probably don't want to negate this matcher; doing so will cause it to pass
-// either when the value is empty or when the wrapped matcher fails.
+// Be careful when negating this matcher. Doing so will cause it to pass either when the value is empty or when the
+// wrapped matcher fails. For example:
 //
-//	Expect(v).NotTo(HaveValueMatching[string](HaveLen(3))) // !!! Fails when !v.Present _or_ when len(v.Get()) != 3
+//	// !!! Assertion passes when len(v.Get()) != 3 _or_ when !v.Present
+//	Expect(v).NotTo(HaveValueMatching(HaveLen(3)))
 //
 // If you want to check for an empty value, then use [BeEmpty]:
 //
@@ -28,24 +29,52 @@ func get[T any](arg optional.Value[T]) (T, error) {
 //
 // If you want to check that a value is present that doesn't match, then negate the wrapped matcher:
 //
-//	Expect(v).To(HaveValueMatching[string](Not(HaveLen(3))))
-func HaveValueMatching[T any](matcher types.GomegaMatcher) types.GomegaMatcher {
-	return gomega.And(
-		gomega.Not(BeEmpty()),
-		gomega.WithTransform(get[T], matcher),
-	)
+//	Expect(v).To(HaveValueMatching(Not(HaveLen(3))))
+func HaveValueMatching(matcher types.GomegaMatcher) types.GomegaMatcher {
+	return &optionalValueMatcher{matcher}
 }
 
-// HaveValueEqualing checks wheter an [optional.Value] holds a value equal to the given value.
-//
-// Be careful when negating this matcher.
-//
-//	Expect(v).NotTo(HaveValueEqualing(3)) // !!! Fails when !v.Present _or_ when v.Get() != 3
-//
-// More likely, you want to check that the [optional.Value] contains a value, and that the contained value is not equal
-// to something. Use [HaveValueMatching] for that and negate the wrapped matcher. For example:
-//
-//	Expect(v).To(HaveValueMatching[int](Not(Equal(3))))
-func HaveValueEqualing[T any](arg T) types.GomegaMatcher {
-	return HaveValueMatching[T](gomega.Equal(arg))
+type optionalValueMatcher struct {
+	Matcher types.GomegaMatcher
+}
+
+func (m *optionalValueMatcher) Match(actual any) (success bool, err error) {
+	opt, ok := actual.(optional.AnyGetter)
+	if !ok {
+		// actual isn't an optional.Value
+		return false, fmt.Errorf("HaveValueMatching matcher expects an optional.Value. Got:\n%s",
+			format.Object(actual, 1))
+	}
+	val, err := opt.GetAny()
+	if err != nil {
+		// actual is empty
+		return false, nil
+	}
+	return m.Matcher.Match(val)
+}
+
+func (m *optionalValueMatcher) FailureMessage(actual any) (message string) {
+	opt, ok := actual.(optional.AnyGetter)
+	if !ok {
+		panic("Match should have failed.")
+	}
+	val, err := opt.GetAny()
+	if err != nil {
+		if !errors.Is(err, optional.ErrEmpty) {
+			// The only thing Get can ever return is ErrEmpty, so if we get here, we're in trouble.
+			panic(err)
+		}
+		return format.Message(actual, "to hold a matching value")
+	}
+	return m.Matcher.FailureMessage(val)
+}
+
+func (m *optionalValueMatcher) NegatedFailureMessage(actual any) (message string) {
+	return m.Matcher.NegatedFailureMessage(actual) + "\nnor to be empty"
+}
+
+// HaveValueEqualing checks whether an [optional.Value] holds a value equal to the given value. It's syntactic sugar for
+// [HaveValueMatching]([gomega.Equal](arg)).
+func HaveValueEqualing(arg any) types.GomegaMatcher {
+	return HaveValueMatching(gomega.Equal(arg))
 }

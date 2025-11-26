@@ -129,6 +129,20 @@ func (o Value[T]) String() string {
 	return "None"
 }
 
+// AnyGetter is a type-erased interface for [Value], allowing code to get a Value's value without knowing the generic
+// type in advance.
+type AnyGetter interface {
+	GetAny() (any, error)
+}
+
+var _ AnyGetter = &Value[any]{}
+
+// GetAny returns the current value, if there is one, with the specific type erased. If the Value is empty, then
+// [ErrEmpty] is returned, and the value result is unspecified.
+func (o Value[T]) GetAny() (result any, err error) {
+	return o.Get()
+}
+
 // Transform applies the given function to the optional value if the input value is non-empty, and returns a new
 // optional of the corresponding return type holding the returned value. Returns an empty value if the input is empty.
 func Transform[T, U any](in Value[T], fn func(T) U) Value[U] {

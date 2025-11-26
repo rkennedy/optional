@@ -46,15 +46,22 @@ var _ = Describe("Optional matchers", func() {
 			},
 			Entry("int", optional.New(1), opt.HaveValueEqualing(1)),
 			Entry("string", optional.New("s"), opt.HaveValueEqualing("s")),
-			Entry("string matcher", optional.New("s"), opt.HaveValueMatching[string](HaveLen(1))),
+			Entry("string matcher", optional.New("s"), opt.HaveValueMatching(HaveLen(1))),
 			Entry("except for empty", optional.Value[int]{}, Not(opt.HaveValueEqualing(1))),
 		)
 
-		It("mismatches on wrong types", func() {
+		It("has same type expectation has its matcher", func() {
 			o := optional.New(1)
 
-			m := opt.HaveValueMatching[string](gstruct.Ignore())
-			Expect(m.Match(o)).Error().To(MatchError(MatchRegexp(`^Transform function expects.*but we have`)))
+			m := opt.HaveValueMatching(HaveLen(1))
+			Expect(m.Match(o)).Error().To(MatchError(MatchRegexp(`^HaveLen matcher expects a`)))
+		})
+
+		It("mismatches on non-optional type", func() {
+			vi := int(1)
+
+			m := opt.HaveValueMatching(gstruct.Ignore())
+			Expect(m.Match(vi)).Error().To(MatchError(MatchRegexp(`expects an optional.Value`)))
 		})
 
 		It("produces a message on empty mismatch", func() {
@@ -62,8 +69,8 @@ var _ = Describe("Optional matchers", func() {
 
 			m := opt.HaveValueEqualing(1)
 			Expect(m.Match(o)).To(BeFalse())
-			Expect(m.FailureMessage(o)).To(Equal(
-				"Expected\n    <optional.Value[int] | len:0, cap:0>: []\nnot to be empty"))
+			Expect(m.FailureMessage(o)).To(HavePrefix(
+				"Expected\n    <optional.Value[int] | len:0, cap:0>: []\nto hold a matching value"))
 		})
 
 		It("produces matcher's message on mismatch", func() {
@@ -72,7 +79,7 @@ var _ = Describe("Optional matchers", func() {
 			submatch := HaveLen(2)
 			submatchMessage := submatch.FailureMessage(o.MustGet())
 
-			m := opt.HaveValueMatching[string](submatch)
+			m := opt.HaveValueMatching(submatch)
 			Expect(m.Match(o)).To(BeFalse())
 
 			Expect(m.FailureMessage(o)).To(Equal(submatchMessage))
