@@ -12,8 +12,30 @@ import (
 	"sweetkennedy.net/optional"
 )
 
-// BeEmpty asserts that the tested value is an empty [optional.Value] with type T.
-var BeEmpty = gomega.BeEmpty
+// BeEmpty asserts that the tested value is an empty [optional.Value].
+func BeEmpty() types.GomegaMatcher {
+	return &emptyMatcher{}
+}
+
+type emptyMatcher struct{}
+
+func (*emptyMatcher) Match(actual any) (success bool, err error) {
+	opt, ok := actual.(optional.AnyGetter)
+	if !ok {
+		// actual isn't an optional.Value
+		return false, fmt.Errorf("BeEmpty matcher expects an optional.Value. Got:\n%s",
+			format.Object(actual, 1))
+	}
+	return !opt.Present(), nil
+}
+
+func (*emptyMatcher) FailureMessage(actual any) (message string) {
+	return format.Message(actual, "not to have a value")
+}
+
+func (*emptyMatcher) NegatedFailureMessage(actual any) (message string) {
+	return format.Message(actual, "to have a value")
+}
 
 // HaveValueMatching checks whether an [optional.Value] holds a value that matches the given matcher.
 //
