@@ -12,14 +12,12 @@ import (
 
 var _ = Describe("Optional matchers", func() {
 	Context("BeEmpty", func() {
-		DescribeTable("matches values",
-			func(o any, match types.GomegaMatcher) {
-				Expect(o).To(match)
+		DescribeTable("matches empty values",
+			func(o any) {
+				Expect(o).To(opt.BeEmpty())
 			},
-			Entry("empty int", optional.Value[int]{}, opt.BeEmpty()),
-			Entry("empty string", optional.Value[string]{}, opt.BeEmpty()),
-			Entry("int", optional.New(1), Not(opt.BeEmpty())),
-			Entry("string", optional.New("s"), Not(opt.BeEmpty())),
+			Entry("empty int", optional.Value[int]{}),
+			Entry("empty string", optional.Value[string]{}),
 		)
 
 		It("produces a message when not empty", func() {
@@ -30,25 +28,44 @@ var _ = Describe("Optional matchers", func() {
 				"Expected\n    <optional.Value[int]>: {value: 1}\nnot to have a value"))
 		})
 
-		It("produces a message when empty", func() {
-			vi := optional.Value[int]{}
-			m := Not(opt.BeEmpty())
-			Expect(m.Match(vi)).To(BeFalse())
-			Expect(m.FailureMessage(vi)).To(Equal(
-				"Expected\n    <optional.Value[int]>: {value: nil}\nto have a value"))
+		When("negated", func() {
+			DescribeTable("matches non-empty values",
+				func(o any) {
+					Expect(o).NotTo(opt.BeEmpty())
+				},
+				Entry("int", optional.New(1)),
+				Entry("string", optional.New("s")),
+			)
+
+			It("produces a message when empty", func() {
+				vi := optional.Value[int]{}
+				m := Not(opt.BeEmpty())
+				Expect(m.Match(vi)).To(BeFalse())
+				Expect(m.FailureMessage(vi)).To(Equal(
+					"Expected\n    <optional.Value[int]>: {value: nil}\nto have a value"))
+			})
 		})
 	})
 
-	Context("HaveValue", func() {
+	Context("HaveValueMatching", func() {
 		DescribeTable("matches values",
 			func(o any, match types.GomegaMatcher) {
-				Expect(o).To(match)
+				Expect(o).To(opt.HaveValueMatching(match))
 			},
-			Entry("int", optional.New(1), opt.HaveValueEqualing(1)),
-			Entry("string", optional.New("s"), opt.HaveValueEqualing("s")),
-			Entry("string matcher", optional.New("s"), opt.HaveValueMatching(HaveLen(1))),
-			Entry("except for empty", optional.Value[int]{}, Not(opt.HaveValueEqualing(1))),
+			Entry("int", optional.New(1), Equal(1)),
+			Entry("string", optional.New("s"), Equal("s")),
+			Entry("string matcher", optional.New("s"), HaveLen(1)),
 		)
+
+		When("negated", func() {
+			DescribeTable("matches values",
+				func(o any, match types.GomegaMatcher) {
+					Expect(o).NotTo(opt.HaveValueMatching(match))
+				},
+				Entry("empty int", optional.Value[int]{}, Equal(1)),
+				Entry("non-matching value", optional.New("foo"), Equal("food")),
+			)
+		})
 
 		It("has same type expectation has its matcher", func() {
 			o := optional.New(1)
@@ -67,7 +84,7 @@ var _ = Describe("Optional matchers", func() {
 		It("produces a message on empty mismatch", func() {
 			o := optional.Value[int]{}
 
-			m := opt.HaveValueEqualing(1)
+			m := opt.HaveValueMatching(gstruct.Ignore())
 			Expect(m.Match(o)).To(BeFalse())
 			Expect(m.FailureMessage(o)).To(HavePrefix(
 				"Expected\n    <optional.Value[int]>: {value: nil}\nto hold a matching value"))
