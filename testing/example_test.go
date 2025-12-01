@@ -32,7 +32,7 @@ func ExampleHaveValueEqualing() {
 	// to equal
 	//     <string>: baz
 	// Expected
-	//     <optional.Value[string] | len:0, cap:0>: []
+	//     <optional.Value[string]>: {value: nil}
 	// to hold a matching value
 }
 
@@ -50,7 +50,7 @@ func ExampleHaveValueEqualing_negated() {
 
 	// Output:
 	// Expected
-	//     <optional.Value[string] | len:1, cap:1>: ["one"]
+	//     <optional.Value[string]>: {value: "one"}
 	// not to equal
 	//     <string>: one
 	// nor to be empty
@@ -72,7 +72,7 @@ func ExampleHaveValueMatching() {
 	// HavePrefix matcher requires a string or stringer.  Got:
 	//     <int>: 1
 	// Expected
-	//     <optional.Value[string] | len:0, cap:0>: []
+	//     <optional.Value[string]>: {value: nil}
 	// to hold a matching value
 }
 
@@ -90,7 +90,7 @@ func ExampleHaveValueMatching_negated() {
 
 	// Output:
 	// Expected
-	//     <optional.Value[string] | len:1, cap:1>: ["green"]
+	//     <optional.Value[string]>: {value: "green"}
 	// not to have prefix
 	//     <string>: g
 	// nor to be empty
